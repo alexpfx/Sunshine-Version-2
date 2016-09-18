@@ -29,6 +29,7 @@ public class SettingsActivity extends PreferenceActivity
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_temperature_units_key)));
     }
 
     /**
@@ -51,7 +52,7 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         String stringValue = value.toString();
-
+        Log.d(TAG, "onPreferenceChange: " + value);
         if (preference instanceof ListPreference) {
             // For list preferences, look up the correct display value in
             // the preference's 'entries' list (since they have separate labels/values).
@@ -64,14 +65,14 @@ public class SettingsActivity extends PreferenceActivity
             // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);
         }
-        savePrefChange (preference, value);
+        savePrefChange(preference, value);
         return true;
     }
 
     private void savePrefChange(Preference preference, Object value) {
-        Log.d(TAG, "savePrefChange: "+preference);
-        Log.d(TAG, "savePrefChange: "+value);
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.pref_key),Context.MODE_PRIVATE);
+        Log.d(TAG, "savePrefChange: " + preference);
+        Log.d(TAG, "savePrefChange: " + value);
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = sharedPreferences.edit();
         edit.putString(preference.getKey(), (String) value);
         edit.commit();

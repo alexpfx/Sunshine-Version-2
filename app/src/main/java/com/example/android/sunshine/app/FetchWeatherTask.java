@@ -28,8 +28,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     @Override
     protected String[] doInBackground(String... param) {
-        Log.d(TAG, "doInBackground: param:"+param[0]);
-        return getForecastData(param[0]);
+        Log.d(TAG, "doInBackground: param:" + param[0]);
+        return getForecastData(param[0], TemperatureUnit.getByCode(param[1]));
     }
 
     @Override
@@ -37,20 +37,20 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         callback.onDataReceived(s);
     }
 
-    String[] getForecastData(String zipCode) {
+    String[] getForecastData(String zipCode, TemperatureUnit unit) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         try {
 
             Integer days = 7;
             Uri uri = Uri.parse("http://api.openweathermap.org/data/2.5/forecast/daily?").buildUpon()
-                    .appendQueryParameter("id", zipCode)
+                    .appendQueryParameter("q", zipCode)
                     .appendQueryParameter("mode", "json")
                     .appendQueryParameter("units", "metric")
                     .appendQueryParameter("cnt", String.valueOf(days))
                     .appendQueryParameter("APPID", BuildConfig.OPEN_WEATHER_MAP_API_KEY).build();
 
-            Log.d(TAG, "getForecastData: "+uri.toString());
+            Log.d(TAG, "getForecastData: " + uri.toString());
             URL url = new URL(uri.toString());
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -69,7 +69,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             if (sb.length() == 0) {
                 return null;
             }
-            return getWeatherDataFromJson(sb.toString(),7);
+            return getWeatherDataFromJson(sb.toString(), 7, unit);
 
 
         } catch (MalformedURLException e) {
@@ -110,10 +110,11 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
     /**
      * Prepare the weather high/lows for presentation.
      */
-    private String formatHighLows(double high, double low) {
+    private String formatHighLows(double high, double low, TemperatureUnit temperatureUnit) {
         // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
+        Log.d(TAG, "formatHighLows: "+temperatureUnit);
+        long roundedHigh = Math.round(temperatureUnit.fromCelsius(high));
+        long roundedLow = Math.round(temperatureUnit.fromCelsius(low));
 
         String highLowStr = roundedHigh + "/" + roundedLow;
         return highLowStr;
@@ -126,7 +127,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays, TemperatureUnit temperatureUnit)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
@@ -185,7 +186,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
 
-            highAndLow = formatHighLows(high, low);
+            highAndLow = formatHighLows(high, low, temperatureUnit);
             resultStrs[i] = day + " - " + description + " - " + highAndLow;
         }
         return resultStrs;

@@ -20,6 +20,7 @@
 
     <string name="pref_temperatura_units_default_value">metric</string>
     <string name="pref_temperatura_units_default_title">Métrico</string>
+    <string name="action_show_pref_location">Show Pref Location on Map</string>
 
     <string-array name="pref_units_entries">
         <item>Métrico</item>

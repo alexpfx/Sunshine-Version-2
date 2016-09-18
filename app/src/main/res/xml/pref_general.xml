@@ -19,6 +19,8 @@
         android:entries="@array/pref_units_entries"
         android:entryValues="@array/pref_units_values"
         android:defaultValue="@string/pref_temperatura_units_default_value"
+
+
         />
 
 
