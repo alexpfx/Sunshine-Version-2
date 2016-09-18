@@ -1,6 +1,8 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -35,6 +37,12 @@ public class ForecastFragment extends Fragment implements FetchWeatherTask.Callb
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,7 +64,6 @@ public class ForecastFragment extends Fragment implements FetchWeatherTask.Callb
             }
         });
 
-
         return rootView;
     }
 
@@ -71,13 +78,15 @@ public class ForecastFragment extends Fragment implements FetchWeatherTask.Callb
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.action_refresh:
-                return fetchWeatherData();
+                return updateWeather();
         }
         return false;
     }
 
-    private boolean fetchWeatherData() {
-        new FetchWeatherTask(this).execute("94040");
+    private boolean updateWeather() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
+        String locationCode = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.pref_default_location_code));
+        new FetchWeatherTask(this).execute(locationCode);
         return true;
     }
 

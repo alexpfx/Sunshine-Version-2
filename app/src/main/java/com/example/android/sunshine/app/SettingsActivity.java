@@ -1,11 +1,14 @@
 package com.example.android.sunshine.app;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -18,15 +21,14 @@ import android.preference.PreferenceManager;
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener {
 
+
+    private static final String TAG = "SettingsActivity";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Add 'general' preferences, defined in the XML file
-        // TODO: Add preferences from XML
-
-        // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
-        // updated when the preference changes.
-        // TODO: Add preferences
+        addPreferencesFromResource(R.xml.pref_general);
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
     }
 
     /**
@@ -62,7 +64,17 @@ public class SettingsActivity extends PreferenceActivity
             // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);
         }
+        savePrefChange (preference, value);
         return true;
+    }
+
+    private void savePrefChange(Preference preference, Object value) {
+        Log.d(TAG, "savePrefChange: "+preference);
+        Log.d(TAG, "savePrefChange: "+value);
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.pref_key),Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putString(preference.getKey(), (String) value);
+        edit.commit();
     }
 
 }

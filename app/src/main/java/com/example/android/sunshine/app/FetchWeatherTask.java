@@ -28,6 +28,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     @Override
     protected String[] doInBackground(String... param) {
+        Log.d(TAG, "doInBackground: param:"+param[0]);
         return getForecastData(param[0]);
     }
 
@@ -41,16 +42,15 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         BufferedReader reader = null;
         try {
 
-
             Integer days = 7;
             Uri uri = Uri.parse("http://api.openweathermap.org/data/2.5/forecast/daily?").buildUpon()
-                    .appendQueryParameter("q", zipCode)
+                    .appendQueryParameter("id", zipCode)
                     .appendQueryParameter("mode", "json")
                     .appendQueryParameter("units", "metric")
                     .appendQueryParameter("cnt", String.valueOf(days))
                     .appendQueryParameter("APPID", BuildConfig.OPEN_WEATHER_MAP_API_KEY).build();
 
-
+            Log.d(TAG, "getForecastData: "+uri.toString());
             URL url = new URL(uri.toString());
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -77,7 +77,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         } catch (IOException e) {
             return null;
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            return new String[0];
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
