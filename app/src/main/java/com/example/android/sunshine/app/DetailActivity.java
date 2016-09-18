@@ -16,15 +16,16 @@
 
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -75,6 +76,9 @@ public class DetailActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
 
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            TextView detailForecast = (TextView) rootView.findViewById(R.id.detail_text);
+            String forecast = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
+            detailForecast.setText(forecast);
             return rootView;
         }
     }

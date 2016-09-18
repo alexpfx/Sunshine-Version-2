@@ -1,8 +1,8 @@
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,9 +12,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -23,6 +22,7 @@ public class ForecastFragment extends Fragment implements FetchWeatherTask.Callb
     private ListView listView;
 
     private static final String TAG = "ForecastFragment";
+    private ArrayAdapter<String> forecastAdapter;
 
     public ForecastFragment() {
 
@@ -32,6 +32,7 @@ public class ForecastFragment extends Fragment implements FetchWeatherTask.Callb
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
 
@@ -41,10 +42,17 @@ public class ForecastFragment extends Fragment implements FetchWeatherTask.Callb
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        forecastAdapter = new ArrayAdapter<>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, new ArrayList());
+        listView.setAdapter(
+                forecastAdapter);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getActivity(), String.valueOf(adapterView.getAdapter().getItem(i)), Toast.LENGTH_SHORT).show();
+                String forecast = forecastAdapter.getItem(i);
+                Intent detail = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, forecast);
+
+                startActivity(detail);
             }
         });
 
@@ -75,7 +83,10 @@ public class ForecastFragment extends Fragment implements FetchWeatherTask.Callb
 
     @Override
     public void onDataReceived(String data[]) {
-        listView.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, Arrays.asList(data)));
+        forecastAdapter.clear();
+        for (String s : data) {
+            forecastAdapter.add(s);
+        }
 
     }
 
